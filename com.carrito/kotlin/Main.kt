@@ -90,4 +90,52 @@ fun main() {
     println("¡Gracias por usar el sistema! 🛒")
 }
 
+// Función para loguear errores en un archivo
+fun logError(message: String) {
+    try {
+        FileWriter("log/errors.log", true).use { writer ->
+            writer.appendLine("${java.time.LocalDateTime.now()}: $message")
+        }
+    } catch (e: IOException) {
+        println("Error al loguear: ${e.message}")
+    }
+}
+
+// Función para validar input con un predicado personalizado
+fun validateInput(prompt: String, validator: (String) -> Boolean, errorMsg: String): String? {
+    print(prompt)
+    val input = readLine()?.trim()
+    return if (input != null && validator(input)) input else {
+        println(errorMsg)
+        logError("$errorMsg - Input: $input")
+        null
+    }
+}
+
+// Función para validar códigos de producto (alfanuméricos simples)
+fun validateProductCode(code: String): Boolean {
+    val regex = Regex("^[A-Za-z0-9]+$") // Solo alfanuméricos, sin espacios
+    return code.isNotBlank() && regex.matches(code)
+}
+
+// Función para validar cantidades numéricas (enteros positivos)
+fun validateQuantity(input: String): Int? {
+    val qty = input.trim().toIntOrNull()
+    return if (qty != null && qty > 0) qty else null
+}
+
+// Función para validar precio decimal (double positivo)
+fun validatePrice(input: String): Double? {
+    val price = input.trim().toDoubleOrNull()
+    return if (price != null && price > 0.0) price else null
+}
+
+// Función para pedir confirmación con s/n
+fun confirmAction(prompt: String): Boolean {
+    print("$prompt (s/n): ")
+    val response = readLine()?.trim()?.lowercase()
+    return response == "s"
+}
+
+
 }
