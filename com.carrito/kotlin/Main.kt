@@ -136,6 +136,49 @@ fun confirmAction(prompt: String): Boolean {
     val response = readLine()?.trim()?.lowercase()
     return response == "s"
 }
-
+// Función para agregar un producto al carrito con validación y confirmación usando código
+fun addToCart(cart: ShoppingCart) {
+    println("\n===  Agregar  Producto  al  Carrito  ===")
+    println(Inventory.displayProducts())
+    val code = validateInput("Ingresa el código del producto: ", { validateProductCode(it) }, "Código inválido: solo letras y números permitidos") ?: return
+    val product = Inventory.findProduct(code) ?: run {
+        println("Producto con código $code no encontrado.")
+        return
+    }
+    val qtyInput = validateInput("Ingresa la cantidad: ", { it.isNotBlank() }, "Cantidad no puede estar vacía") ?: return
+    val qty = validateQuantity(qtyInput) ?: run {
+        println("Cantidad inválida: debe ser un número entero positivo.")
+        logError("Cantidad inválida: $qtyInput")
+        return
+    }
+    if (confirmAction("¿Confirmar agregar $qty unidades del producto con código $code?")) {
+        if (cart.addItem(product, qty)) {
+            println("Producto agregado exitosamente.")
+        } else {
+            println("No se pudo agregar: cantidad no disponible.")
+        }
+    } else {
+        println("Acción cancelada.")
+    }
+    // Función para eliminar un producto del carrito con confirmación usando código
+fun removeFromCart(cart: ShoppingCart) {
+    if (cart.getItems().isEmpty()) {
+        println("Carrito vacío, nada que eliminar.")
+        return
+    }
+    println("\n===  Eliminar  Producto  del  Carrito  ===")
+    println(cart.display())
+    val code = validateInput("Ingresa el código del producto a eliminar: ", { validateProductCode(it) }, "Código inválido") ?: return
+    if (confirmAction("¿Confirmar eliminar el producto con código $code del carrito?")) {
+        if (cart.removeItem(code)) {
+            println("Producto eliminado.")
+        } else {
+            println("Producto con código $code no encontrado.")
+        }
+    } else {
+        println("Acción cancelada.")
+    }
+}
+}
 
 }
